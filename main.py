@@ -24,7 +24,7 @@ data = pd.read_csv("clean_games.csv", sep=';', encoding='utf-8')
 # CONSULTA 1:
 # def genero( Año: str ): Se ingresa un año y devuelve una lista con los 5 géneros 
 # más ofrecidos en el orden correspondiente.
-@app.get("/genero/{genero}")
+@app.get("/genero/{año}")
 def genero(año: str):
     año_filtro = data[data['release_year'] == año]
     top_generos = año_filtro['genres'].value_counts().head(5).index.tolist()
