@@ -2,8 +2,12 @@
 
 import pandas as pd
 import numpy  as np
-from fastapi import FastAPI
 import uvicorn
+import pickle
+import ast
+from enum                            import Enum
+from fastapi                         import FastAPI
+from fastapi                         import FastAPI, HTTPException
 from sklearn.metrics.pairwise        import cosine_similarity
 from sklearn.utils.extmath           import randomized_svd
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -84,6 +88,44 @@ def metascore(año: str):
 
 
 # MODELO DE PREDICIION
+# Cargar el modelo pickle
+with open("predic_jesu.pkl", "rb") as f:
+    model = pickle.load(f)
+# Crear el Enum de géneros
+class Genre(Enum):
+    Action = "Action"
+    Adventure = "Adventure"
+    Casual = "Casual"
+    Early_Access = "Early Access"
+    Free_to_Play = "Free to Play"
+    Indie = "Indie"
+    Massively_Multiplayer = "Massively Multiplayer"
+    RPG = "RPG"
+    Racing = "Racing"
+    Simulation = "Simulation"
+    Sports = "Sports"
+    Strategy = "Strategy"
+    Video_Production = "Video Production"
+# Ruta de predicción
+@app.get("/predicción/") 
+def predict(metascore: float = None, earlyaccess: bool = None, c: str = None, genero: Genre = None):
+    # Validar que se hayan pasado los parámetros necesarios
+    if metascore is None or Año is None or genero is None or earlyaccess is None:
+        raise HTTPException(status_code=400, detail="Missing parameters")
+    
+    # Convertir el input en un DataFrame con las columnas necesarias para el modelo
+    input_df = pd.DataFrame([[metascore, earlyaccess, Año, *[1 if genero.value == g else 0 for g in Genre._member_names_]]], columns=['metascore', 'year', 'early_access', *Genre._member_names_])
+    
+    # Verificar si el género es Free to Play
+    if genero == Genre.Free_to_Play:
+        # Devolver 0 como precio
+        return {"price": 0, "RMSE del modelo": 8.36}
+    else:
+        # Realizar la predicción con el modelo
+        try:
+            price = model.predict(input_df)[0]
+        except:
+            raise HTTPException(status_code=400, detail="Invalid input")
 
-
-
+        # Devolver el precio y el RMSE como salida
+        return {"price": price, "RMSE del modelo": 8.36}
