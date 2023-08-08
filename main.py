@@ -119,7 +119,7 @@ def predict(metascore: float = None, earlyaccess: bool = None, Año: str = None,
     # Verificar si el género es Free to Play
     if genero == Genre.Free_to_Play:
         # Devolver 0 como precio
-        return {"price": 0, "RMSE del modelo": 10.00}
+        return {"price": 0, "RMSE del modelo": 8.36}
     else:
         # Realizar la predicción con el modelo
         try:
@@ -128,4 +128,4 @@ def predict(metascore: float = None, earlyaccess: bool = None, Año: str = None,
             raise HTTPException(status_code=400, detail="Invalid input")
 
         # Devolver el precio y el RMSE como salida
-        return {"price": price, "RMSE del modelo": 10.00}
+        return {"price": price, "RMSE del modelo": 8.36}
